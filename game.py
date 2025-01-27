@@ -1,97 +1,115 @@
+import pygame
 import sys
-from PyQt5 import QtCore, QtGui, QtWidgets
+import random
+
+# Инициализация Pygame
+pygame.init()
+
+# Настройки окна
+width, height = 800, 600
+screen = pygame.display.set_mode((width, height))
+pygame.display.set_caption("Run from the Monster!")
+
+# Цвета
+hero_color = (0, 255, 0)
+monster_color = (255, 0, 0)
+wall_color = (0, 0, 255)
+background_color = (255, 255, 255)
+
+# Параметры героя
+hero_pos = [width // 2, height // 2]
+hero_size = 20
+hero_speed = 5
+
+# Параметры монстра
+monster_pos = [random.randint(0, width - 20), random.randint(0, height - 20)]
+monster_size = 20
+
+# Генерация стен
+walls = []
+for _ in range(10):  # 10 случайных стен
+    wall_x = random.randint(0, width - 50)
+    wall_y = random.randint(0, height - 50)
+    wall_rect = pygame.Rect(wall_x, wall_y, 50, 10)  # Прямоугольные стены
+    walls.append(wall_rect)
 
 
-# Определение основного окна игры
-class GameWindow(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setGeometry(100, 100, 800, 600)
-        self.central_widget = QtWidgets.QWidget()
-        self.layout = QtWidgets.QVBoxLayout(self.central_widget)
-
-        # Добавление элементов интерфейса
-        self.label = QtWidgets.QLabel("Добро пожаловать в особняк!")
-        self.button = QtWidgets.QPushButton("Начать игру")
-        self.progressBar = QtWidgets.QProgressBar()  # Индикатор прогресса
-        self.menuBar = QtWidgets.QMenuBar()  # Меню с настройками игры
-        self.hintLabel = QtWidgets.QLabel()  # Отображение подсказок
-        self.closeButton = QtWidgets.QPushButton("Закрыть")
-
-        # Настройка элементов интерфейса
-        self.label.setText("Добро пожаловать в особняк!\n\n"
-                           "Здесь вам предстоит решить множество головоломок и найти скрытые подсказки.\n\n"
-                           "Используйте клавиши со стрелками для перемещения по особняку и взаимодействия с объектами.")
-        self.button.clicked.connect(self.start_game)  # Запуск игры при нажатии на кнопку
-        self.menuBar.addAction("Настройки")  # Добавление пункта меню "Настройки"
-        self.update()
-
-        # Добавление всех элементов в окно
-        self.layout.addWidget(self.label)
-        self.layout.addWidget(self.button)
-        self.layout.addWidget(self.progressBar)
-        self.layout.addWidget(self.menuBar)
-
-        # Создание окон с головоломками и подсказками
-        self.puzzleWindow = PuzzleWindow(self)
-        self.hintWindow = HintWindow(self)
-
-    # Реализация логики игры
-    def start_game(self):
-        if not self.is_started:
-            self.is_started = True
-            self.puzzleWindow.show()
-            self.update()
-            # Открытие окна с подсказкой при нажатии кнопки
-            self.button.clicked.connect(lambda: self.hintWindow.showHint(get_hint()))
-
-            # Переход к следующему этапу игры после решения головоломки
-            self.puzzleWindow.solveButton.clicked.connect(self.puzzleWindow.solvePuzzle)
-
-    def update(self):
-        # Обновление индикатора прогресса
-        self.progressBar.setValue(self.solved_puzzles)
+# Функция для проверки столкновения
+def check_collision(rect, walls):
+    for wall in walls:
+        if rect.colliderect(wall):
+            return True
+    return False
 
 
-class PuzzleWindow(QtWidgets.QDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.parent = parent
-        self.setWindowTitle("Головоломка")
-        self.resize(300, 200)
+# Главный игровой цикл
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
 
-        self.gridLayout = QtWidgets.QGridLayout()
-        self.textEdit = QtWidgets.QTextEdit()
-        self.solveButton = QtWidgets.QPushButton("Решить головоломку")
+    # Управление героем
+    keys = pygame.key.get_pressed()
+    new_hero_pos = hero_pos[:]
 
-        self.gridLayout.addWidget(self.textEdit, 0, 0)
-        self.gridLayout.addWidget(self.solveButton, 0, 1)
-        self.setLayout(self.gridLayout)
+    if keys[pygame.K_LEFT]:
+        new_hero_pos[0] -= hero_speed
+    if keys[pygame.K_RIGHT]:
+        new_hero_pos[0] += hero_speed
+    if keys[pygame.K_UP]:
+        new_hero_pos[1] -= hero_speed
+    if keys[pygame.K_DOWN]:
+        new_hero_pos[1] += hero_speed
 
-    def solvePuzzle(self):
-        # Решение головоломки
-        print("Головоломка решена!")
-        self.parent.start_game()
+    # Проверка выхода за границы экрана
+    new_hero_pos[0] = max(0, min(new_hero_pos[0], width - hero_size))
+    new_hero_pos[1] = max(0, min(new_hero_pos[1], height - hero_size))
 
+    # Проверка столкновения героя со стенами
+    hero_rect = pygame.Rect(new_hero_pos[0], new_hero_pos[1], hero_size, hero_size)
+    if not check_collision(hero_rect, walls):
+        hero_pos = new_hero_pos
 
-class HintWindow(QtWidgets.QDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.parent = parent
-        self.setWindowTitle("Подсказка")
-        self.resize(400, 300)
+    # Логика движения монстра
+    if hero_pos[0] < monster_pos[0]:
+        monster_pos[0] -= 2  # Двигаем монстра влево
+    elif hero_pos[0] > monster_pos[0]:
+        monster_pos[0] += 2  # Двигаем монстра вправо
 
-        self.hintLabel = QtWidgets.QLabel()
-        self.closeButton = QtWidgets.QPushButton("Закрыть")
+    if hero_pos[1] < monster_pos[1]:
+        monster_pos[1] -= 2  # Двигаем монстра вверх
+    elif hero_pos[1] > monster_pos[1]:
+        monster_pos[1] += 2  # Двигаем монстра вниз
 
-        self.vLayout = QtWidgets.QVBoxLayout()
-        self.vLayout.addWidget(self.hintLabel)
-        self.vLayout.addWidget(self.closeButton)
-        self.setLayout(self.vLayout)
+    # Проверка выхода монстра за границы экрана
+    monster_pos[0] = max(0, min(monster_pos[0], width - monster_size))
+    monster_pos[1] = max(0, min(monster_pos[1], height - monster_size))
 
-    def showHint(self, hint):
-        self.hintLabel.setText(hint)
-        self.show()
+    # Проверка столкновения монстра со стенами
+    monster_rect = pygame.Rect(monster_pos[0], monster_pos[1], monster_size, monster_size)
+    if check_collision(monster_rect, walls):
+        if hero_pos[0] < monster_pos[0]:
+            monster_pos[0] += 2
+        elif hero_pos[0] > monster_pos[0]:
+            monster_pos[0] -= 2
 
-    def closeEvent(self, event):
-        self.parent.start_game()
+        if hero_pos[1] < monster_pos[1]:
+            monster_pos[1] += 2
+        elif hero_pos[1] > monster_pos[1]:
+            monster_pos[1] -= 2
+
+    # Очистка экрана
+    screen.fill(background_color)
+
+    # Рисование стен
+    for wall in walls:
+        pygame.draw.rect(screen, wall_color, wall)
+
+    # Рисование героя и монстра
+    pygame.draw.rect(screen, hero_color, (hero_pos[0], hero_pos[1], hero_size, hero_size))
+    pygame.draw.rect(screen, monster_color, (monster_pos[0], monster_pos[1], monster_size, monster_size))
+
+    # Обновление экрана
+    pygame.display.flip()
+    pygame.time.Clock().tick(100)
