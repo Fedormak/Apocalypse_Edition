@@ -8,7 +8,7 @@ pygame.init()
 # Настройки окна
 width, height = 800, 600
 screen = pygame.display.set_mode((width, height))
-pygame.display.set_caption("Run from the Monster!")
+pygame.display.set_caption("APE")
 
 # Цвета
 hero_color = (0, 255, 0)
@@ -98,7 +98,8 @@ while True:
             monster_pos[1] += 2
         elif hero_pos[1] > monster_pos[1]:
             monster_pos[1] -= 2
-
+    if monster_pos == hero_pos:
+        exit()
     # Очистка экрана
     screen.fill(background_color)
 
