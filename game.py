@@ -95,16 +95,24 @@ class Monster:
         player_x, player_y = player_pos
         x, y = self.position
 
-        if abs(player_x - x) <= 2 and abs(player_y - y) <= 2:
-            self.move_towards_player(player_pos)
+        # Вычисление направления к игроку
+        if x < player_x:
+            direction = 'E'
+        elif x > player_x:
+            direction = 'W'
+        elif y < player_y:
+            direction = 'S'
+        elif y > player_y:
+            direction = 'N'
         else:
-            direction = random.choice(list(self.maze.DIRECTIONS.keys()))
-            self.move_random(direction)
+            return  # Монстр уже на позиции игрока
 
-    def move_random(self, direction):
+        self.move_towards_player(direction)
+
+    def move_towards_player(self, direction):
         x, y = self.position
 
-        # Переходы с учетом правильного доступа к данным лабиринта
+        # Двигаем монстра в указанном направлении, если это возможно
         if direction == 'N' and not self.maze.maze[y][x]['N']:
             y -= 1
         elif direction == 'S' and not self.maze.maze[y][x]['S']:
