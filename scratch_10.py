@@ -7,7 +7,7 @@ pygame.init()
 # Установка размеров окна
 width, height = 800, 600
 screen = pygame.display.set_mode((width, height))
-pygame.display.set_caption("Погоня красного кружка за мышкой")
+pygame.display.set_caption("Погоня красного к6ружка за мышкой")
 
 # Цвета
 red = (255, 0, 0)
