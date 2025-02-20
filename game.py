@@ -1,6 +1,7 @@
 import pygame
 import random
 import sys
+import time
 
 WIDTH = 50
 HEIGHT = 30
@@ -83,7 +84,7 @@ class Maz:
                 if cell['E']:
                     pygame.draw.line(screen, BLACK, (px + CELL_SIZE, py), (px + CELL_SIZE, py + CELL_SIZE), 2)
 
-    def caught(self, surface):
+    def caught(self, surface, start_time):
         font = pygame.font.Font(None, 50)
         text = font.render("Меню", True, WHITE)
         restart_text = font.render("Нажмите R, чтобы начать заново", True, RED)
@@ -92,6 +93,13 @@ class Maz:
         surface.blit(text, (WIDTH * CELL_SIZE // 2 - text.get_width() // 2, HEIGHT * CELL_SIZE // 2 - 100))
         surface.blit(restart_text, (WIDTH * CELL_SIZE // 2 - restart_text.get_width() // 2, HEIGHT * CELL_SIZE // 2))
 
+        elapsed_time = time.time() - start_time
+        elapsed_time_text = font.render(f"Время игры: {int(elapsed_time)} сек.", True, WHITE)
+
+        pygame.surface.blit(text, (WIDTH * CELL_SIZE // 2 - text.get_width() // 2, HEIGHT * CELL_SIZE // 2 - 100))
+        pygame.surface.blit(restart_text, (WIDTH * CELL_SIZE // 2 - restart_text.get_width() // 2, HEIGHT * CELL_SIZE // 2))
+        pygame.surface.blit(elapsed_time_text,
+                 (WIDTH * CELL_SIZE // 2 - elapsed_time_text.get_width() // 2, HEIGHT * CELL_SIZE // 2 + 50))
 
 
     def move_player(self, player_pos, direction):
@@ -204,6 +212,8 @@ def main():
     pygame.display.set_caption("Лабиринт")
     clock = pygame.time.Clock()
 
+    start_time = time.time()  # Запись времени начала игры
+
     isEnd = False
     menu_surface = pygame.Surface((WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE), pygame.SRCALPHA)
     menu_surface.fill(TRANSPARENT_GRAY)
@@ -265,7 +275,8 @@ def main():
         # Отрисовка элементов после того как тебя поймали
         if isEnd:
             screen.blit(menu_surface, (0, 0))
-            mazf.caught(screen)
+            mazf.caught(screen, start_time)
+            start_time = None # Чтобы не считалось время некст раунда
 
         pygame.draw.circle(screen, RED, (px * CELL_SIZE + CELL_SIZE // 2, py * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 4)
 
@@ -273,7 +284,7 @@ def main():
             monster.draw(screen)
 
         pygame.display.flip()
-        clock.tick(15)
+        clock.tick(50)
 
     pygame.quit()
     sys.exit()
