@@ -93,14 +93,12 @@ class Maz:
         surface.blit(text, (WIDTH * CELL_SIZE // 2 - text.get_width() // 2, HEIGHT * CELL_SIZE // 2 - 100))
         surface.blit(restart_text, (WIDTH * CELL_SIZE // 2 - restart_text.get_width() // 2, HEIGHT * CELL_SIZE // 2))
 
-        elapsed_time = time.time() - start_time
-        elapsed_time_text = font.render(f"Время игры: {int(elapsed_time)} сек.", True, WHITE)
-
-        pygame.surface.blit(text, (WIDTH * CELL_SIZE // 2 - text.get_width() // 2, HEIGHT * CELL_SIZE // 2 - 100))
-        pygame.surface.blit(restart_text, (WIDTH * CELL_SIZE // 2 - restart_text.get_width() // 2, HEIGHT * CELL_SIZE // 2))
-        pygame.surface.blit(elapsed_time_text,
-                 (WIDTH * CELL_SIZE // 2 - elapsed_time_text.get_width() // 2, HEIGHT * CELL_SIZE // 2 + 50))
-
+        # Проверяем, что start_time не равен None
+        if start_time is not None:
+            elapsed_time = time.time() - start_time
+            elapsed_time_text = font.render(f"Время игры: {int(elapsed_time)} сек.", True, WHITE)
+            surface.blit(elapsed_time_text,
+                         (WIDTH * CELL_SIZE // 2 - elapsed_time_text.get_width() // 2, HEIGHT * CELL_SIZE // 2 + 50))
 
     def move_player(self, player_pos, direction):
         x, y = player_pos
@@ -220,7 +218,6 @@ def main():
 
     #Указать количество монстров
 
-
     running = True
     while running:
         screen.fill(WHITE)  # Очистка перед отрисовкой
@@ -242,8 +239,6 @@ def main():
                         monster = Monster(mazf, player_pos)
                         listOfMomster.append(monster)
 
-                # Очистить экран
-
         keys = pygame.key.get_pressed()
         if not isEnd:
             if keys[pygame.K_UP]:
@@ -255,12 +250,24 @@ def main():
             if keys[pygame.K_RIGHT]:
                 player_pos = mazf.move_player(player_pos, 'E')
 
-        # Движение монстров
+        # Проверка на достижение угла карты
+        if player_pos == (0, 0) or \
+                player_pos == (WIDTH - 1, 0) or \
+                player_pos == (0, HEIGHT - 1) or \
+                player_pos == (WIDTH - 1, HEIGHT - 1):
+            # Генерация новой карты и монстров
+            mazf.generate_maze(WIDTH, HEIGHT)
+            player_pos = player.generate_posion_player()
+            listOfMomster.clear()
+            MonsterPosition.clear()
+            for _ in range(N_mosters):
+                monster = Monster(mazf, player_pos)
+                listOfMomster.append(monster)
 
+        # Движение монстров
         for monster in listOfMomster:
             monster.move(player_pos)
             MonsterPosition.append(monster.position)
-
 
         # Отрисовка лабиринта, игрока и монстров
         mazf.draw_maze(screen)
@@ -269,16 +276,16 @@ def main():
         # Проверка на столкновение
         if not isEnd and player_pos in MonsterPosition:
             isEnd = True
-
             print("Game Over! The monster caught you!")
 
         # Отрисовка элементов после того как тебя поймали
         if isEnd:
             screen.blit(menu_surface, (0, 0))
             mazf.caught(screen, start_time)
-            start_time = None # Чтобы не считалось время некст раунда
+            start_time = None  # Чтобы не считалось время некст раунда
 
-        pygame.draw.circle(screen, RED, (px * CELL_SIZE + CELL_SIZE // 2, py * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 4)
+        pygame.draw.circle(screen, RED, (px * CELL_SIZE + CELL_SIZE // 2, py * CELL_SIZE + CELL_SIZE // 2),
+                           CELL_SIZE // 4)
 
         for monster in listOfMomster:
             monster.draw(screen)
@@ -288,6 +295,7 @@ def main():
 
     pygame.quit()
     sys.exit()
+
 
 if __name__ == "__main__":
     main()
