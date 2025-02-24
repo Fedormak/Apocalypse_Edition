@@ -94,9 +94,9 @@ class Maz:
         restart_text = font.render("Нажмите R, чтобы начать заново", True, RED)
 
         # Центрируем текст
-        surface.blit(text, (WIDTH * CELL_SIZE // 2 - text.get_width() // 2, HEIGHT * CELL_SIZE // 2 - 200))
-        surface.blit(count, (WIDTH * CELL_SIZE // 2 - count.get_width() // 2, HEIGHT * CELL_SIZE // 2 - 100))
-        surface.blit(restart_text, (WIDTH * CELL_SIZE // 2 - restart_text.get_width() // 2, HEIGHT * CELL_SIZE // 2))
+        surface.blit(text, (WIDTH * CELL_SIZE // 2 - text.get_width() // 2, HEIGHT * CELL_SIZE // 2 - 100))
+        surface.blit(count, (WIDTH * CELL_SIZE // 2 - count.get_width() // 2, HEIGHT * CELL_SIZE // 2 ))
+        surface.blit(restart_text, (WIDTH * CELL_SIZE // 2 - restart_text.get_width() // 2, HEIGHT * CELL_SIZE // 2 + 100))
 
 
         # Проверяем, что start_time не равен None
@@ -146,6 +146,7 @@ class Monster:
             return  # Если задержка не прошла, монстр не двигается
 
         self.last_move_time = current_time  # Обновляем время последнего движения
+
         self.player_pos = player_pos
         player_x, player_y = player_pos
         x, y = self.position
