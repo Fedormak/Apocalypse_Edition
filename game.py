@@ -100,6 +100,7 @@ class Maz:
             surface.blit(elapsed_time_text,
                          (WIDTH * CELL_SIZE // 2 - elapsed_time_text.get_width() // 2, HEIGHT * CELL_SIZE // 2 + 50))
 
+
     def move_player(self, player_pos, direction):
         x, y = player_pos
         dx, dy = self.DIRECTIONS[direction]
@@ -110,6 +111,8 @@ class Maz:
         return x, y
 
 
+import time  # Импортируем модуль для работы с временем
+
 class Monster:
     def __init__(self, maze, player_pos):
         self.maze = maze
@@ -119,6 +122,8 @@ class Monster:
             self.position = self.random_position()
         self.x, self.y = self.position
         self.direction = random.choice(["E", "W", "S", "N"])
+        self.last_move_time = time.time()  # Время последнего движения
+        self.move_delay = 0.3  # Задержка между движениями (в секундах)
 
     def random_position(self):
         while True:
@@ -130,6 +135,11 @@ class Monster:
             return (x, y)
 
     def move(self, player_pos):
+        current_time = time.time()  # Текущее время
+        if current_time - self.last_move_time < self.move_delay:  # Проверяем задержку
+            return  # Если задержка не прошла, монстр не двигается
+
+        self.last_move_time = current_time  # Обновляем время последнего движения
         self.player_pos = player_pos
         player_x, player_y = player_pos
         x, y = self.position
@@ -202,7 +212,7 @@ def main():
     player = Player(mazf)
     player_pos = player.generate_posion_player()
 
-    N_mosters = 7
+    N_mosters = 15
     listOfMomster = list()
     MonsterPosition = list()
     for _ in range(N_mosters):
@@ -220,6 +230,7 @@ def main():
     menu_surface.fill(TRANSPARENT_GRAY)
 
     #Указать количество монстров
+
 
     running = True
     while running:
@@ -241,6 +252,8 @@ def main():
                     for _ in range(N_mosters):
                         monster = Monster(mazf, player_pos)
                         listOfMomster.append(monster)
+
+                # Очистить экран
 
         keys = pygame.key.get_pressed()
         if not isEnd:
@@ -269,9 +282,11 @@ def main():
                 listOfMomster.append(monster)
 
         # Движение монстров
+
         for monster in listOfMomster:
             monster.move(player_pos)
             MonsterPosition.append(monster.position)
+
 
         # Отрисовка лабиринта, игрока и монстров
         mazf.draw_maze(screen)
@@ -280,6 +295,7 @@ def main():
         # Проверка на столкновение
         if not isEnd and player_pos in MonsterPosition:
             isEnd = True
+
             print("Game Over! The monster caught you!")
 
         # Отрисовка элементов после того как тебя поймали
@@ -295,11 +311,10 @@ def main():
             monster.draw(screen)
 
         pygame.display.flip()
-        clock.tick(50)
+        clock.tick(100)
 
     pygame.quit()
     sys.exit()
-
 
 if __name__ == "__main__":
     main()
