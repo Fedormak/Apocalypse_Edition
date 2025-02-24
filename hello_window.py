@@ -1,5 +1,6 @@
 import pygame
 import csv
+import os
 from game import main
 
 # Инициализация Pygame
@@ -29,6 +30,12 @@ button = pygame.Rect(250, 250, 100, 50)
 
 # CSV-файл для записи
 csv_file = "players.csv"
+
+# Создание файла, если он не существует
+if not os.path.exists(csv_file):
+    with open(csv_file, mode="w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+        writer.writerow(["Nickname", "Score"])  # Заголовки столбцов
 
 # Функция для записи данных в CSV
 def write_to_csv(nickname, score=0):
