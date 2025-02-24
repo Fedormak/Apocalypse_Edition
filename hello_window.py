@@ -1,8 +1,7 @@
 import pygame
-import csv
 import os
 from game import main
-
+NICKNAME = ''
 # Инициализация Pygame
 pygame.init()
 
@@ -30,20 +29,11 @@ active = False
 # Кнопка "Играть"
 button = pygame.Rect(250, 250, 100, 50)
 
-# CSV-файл для записи
-csv_file = "players.csv"
 
-# Создание файла, если он не существует
-if not os.path.exists(csv_file):
-    with open(csv_file, mode="w", newline="", encoding="utf-8") as file:
-        writer = csv.writer(file)
-        writer.writerow(["Nickname", "Score"])  # Заголовки столбцов
+
 
 # Функция для записи данных в CSV
-def write_to_csv(nickname, score=0):
-    with open(csv_file, mode="a", newline="", encoding="utf-8") as file:
-        writer = csv.writer(file)
-        writer.writerow([nickname, score])
+
 
 # Основной цикл
 running = True
@@ -62,18 +52,18 @@ while running:
                 active = False
             # Проверка нажатия на кнопку "Играть"
             if button.collidepoint(event.pos) and input_text.strip():
-                write_to_csv(input_text.strip())  # Запись ника в CSV
+                NICKNAME = input_text.strip()
                 print(f"Игрок {input_text.strip()} добавлен в CSV!")
                 running = False  # Закрыть окно после нажатия
-                main()
+                main(NICKNAME)
                 exit()
         elif event.type == pygame.KEYDOWN and active:
             if event.key == pygame.K_RETURN:  # Нажатие Enter
                 if input_text.strip():
-                    write_to_csv(input_text.strip())
+                    NICKNAME = input_text.strip()
                     print(f"Игрок {input_text.strip()} добавлен в CSV!")
                     running = False
-                    main()
+                    main(NICKNAME)
                     exit()
             elif event.key == pygame.K_BACKSPACE:  # Удаление символа
                 input_text = input_text[:-1]

@@ -1,7 +1,7 @@
 import pygame
 import random
 import sys
-import os
+import csv
 
 WIDTH = 50
 HEIGHT = 30
@@ -12,6 +12,10 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
+
+
+# CSV-файл для записи
+csv_file = "players.csv"
 
 class Player:
     def __init__(self, maze):
@@ -204,7 +208,7 @@ class Monster:
         px, py = self.position
         pygame.draw.circle(screen, GREEN, (px * CELL_SIZE + CELL_SIZE // 2, py * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 4)
 
-def main():
+def main(nick):
     pygame.init()
     mazf = Maz()
     maze = mazf.generate_maze(WIDTH, HEIGHT)
@@ -309,6 +313,7 @@ def main():
         # Проверка на столкновение
         if not isEnd and player_pos in MonsterPosition:
             isEnd = True
+            write_to_csv(nick, )
 
             print("Game Over! The monster caught you!")
 
@@ -329,6 +334,12 @@ def main():
 
     pygame.quit()
     sys.exit()
+
+
+def write_to_csv(nickname, score=0):
+    with open(csv_file, mode="a", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+        writer.writerow([nickname, score])
 
 if __name__ == "__main__":
     main()
