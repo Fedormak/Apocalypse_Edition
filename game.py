@@ -194,7 +194,6 @@ class Monster:
 
     def draw(self, screen):
         px, py = self.position
-
         pygame.draw.circle(screen, GREEN, (px * CELL_SIZE + CELL_SIZE // 2, py * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 4)
 
 def main():
