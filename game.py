@@ -7,7 +7,7 @@ WIDTH = 50
 HEIGHT = 30
 CELL_SIZE = 30
 
-TRANSPARENT_GRAY = (128, 128, 128, 150)
+TRANSPARENT_GRAY = (128, 128, 128, 200)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
@@ -85,16 +85,19 @@ class Maz:
                     pygame.draw.line(screen, BLACK, (px + CELL_SIZE, py), (px + CELL_SIZE, py + CELL_SIZE), 2)
 
         for exitPos in exit_coords:
-            pygame.draw.rect(screen, (255, 255, 0), (exitPos[0] * CELL_SIZE, exitPos[1] * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+            pygame.draw.rect(screen, (255, 255, 0), (exitPos[0] * CELL_SIZE, exitPos[1] * CELL_SIZE, CELL_SIZE - 1, CELL_SIZE - 1))
 
-    def caught(self, surface, start_time):
+    def caught(self, surface, start_time, countPointen):
         font = pygame.font.Font(None, 50)
-        text = font.render("Меню", True, WHITE)
+        text = font.render("Вас поймали((", True, WHITE)
+        count = font.render(f"Вы набрали: {countPointen}", True, WHITE)
         restart_text = font.render("Нажмите R, чтобы начать заново", True, RED)
 
         # Центрируем текст
-        surface.blit(text, (WIDTH * CELL_SIZE // 2 - text.get_width() // 2, HEIGHT * CELL_SIZE // 2 - 100))
+        surface.blit(text, (WIDTH * CELL_SIZE // 2 - text.get_width() // 2, HEIGHT * CELL_SIZE // 2 - 200))
+        surface.blit(count, (WIDTH * CELL_SIZE // 2 - count.get_width() // 2, HEIGHT * CELL_SIZE // 2 - 100))
         surface.blit(restart_text, (WIDTH * CELL_SIZE // 2 - restart_text.get_width() // 2, HEIGHT * CELL_SIZE // 2))
+
 
         # Проверяем, что start_time не равен None
         if start_time is not None:
@@ -209,6 +212,8 @@ def main():
     mazf = Maz()
     maze = mazf.generate_maze(WIDTH, HEIGHT)
 
+    countPointen = 0
+
     #точки выхода в лабирините
     exit_coords = list(([(0, 0), (WIDTH - 1, 0), (0, HEIGHT - 1), (WIDTH - 1, HEIGHT - 1)]))
 
@@ -250,6 +255,7 @@ def main():
                     mazf.generate_maze(WIDTH, HEIGHT)
                     player_pos = player.generate_posion_player()
                     screen.fill(WHITE)
+                    countPointen = 0
                     exit_coords = list(([(0, 0), (WIDTH - 1, 0), (0, HEIGHT - 1), (WIDTH - 1, HEIGHT - 1)]))
                     listOfMomster.clear()
                     MonsterPosition.clear()
@@ -275,6 +281,7 @@ def main():
 
         # Проверка на достижение угла карты
         if player_pos in exit_coords:
+            countPointen += 1
             exit_coords = list(([(0, 0), (WIDTH - 1, 0), (0, HEIGHT - 1), (WIDTH - 1, HEIGHT - 1)]))
 
             exit_coords.pop(exit_coords.index(player_pos))
@@ -308,7 +315,7 @@ def main():
         # Отрисовка элементов после того как тебя поймали
         if isEnd:
             screen.blit(menu_surface, (0, 0))
-            mazf.caught(screen, start_time)
+            mazf.caught(screen, start_time, countPointen)
             start_time = None  # Чтобы не считалось время некст раунда
 
         pygame.draw.circle(screen, RED, (px * CELL_SIZE + CELL_SIZE // 2, py * CELL_SIZE + CELL_SIZE // 2),
