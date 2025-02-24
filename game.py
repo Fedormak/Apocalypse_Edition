@@ -175,18 +175,29 @@ class Monster:
     def move_monster(self):
         new_x, new_y = self.position
 
+        new_derection = list(["E", "W", "S", "N"])
+
+
+        befor_position = self.maze.maze[new_y][new_x]
 
         # Двигаемся в текущем направлении
         if self.direction == "N" and not self.maze.maze[new_y][new_x]['N']:
+            new_derection.pop(new_derection.index("S"))
             new_y -= 1
         elif self.direction == "S" and not self.maze.maze[new_y][new_x]['S']:
+            new_derection.pop(new_derection.index("N"))
             new_y += 1
         elif self.direction == "W"  and not self.maze.maze[new_y][new_x]['W']:
+            new_derection.pop(new_derection.index("E"))
             new_x -= 1
         elif self.direction == "E" and not self.maze.maze[new_y][new_x]['E']:
+            new_derection.pop(new_derection.index("W"))
             new_x += 1
         else:
-            self.direction = random.choice(["E", "W", "S", "N"])
+            self.direction = random.choice(new_derection)
+
+        if befor_position != self.maze.maze[new_y][new_x]:
+            self.direction = random.choice(new_derection)
 
         self.position = (new_x, new_y)
 
