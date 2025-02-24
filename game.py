@@ -70,7 +70,7 @@ class Maz:
         print(self.maze)
         return self.maze
 
-    def draw_maze(self, screen):
+    def draw_maze(self, screen, exit_coords):
         for y in range(HEIGHT):
             for x in range(WIDTH):
                 cell = self.maze[y][x]
@@ -83,6 +83,9 @@ class Maz:
                     pygame.draw.line(screen, BLACK, (px, py), (px, py + CELL_SIZE), 2)
                 if cell['E']:
                     pygame.draw.line(screen, BLACK, (px + CELL_SIZE, py), (px + CELL_SIZE, py + CELL_SIZE), 2)
+
+        for exitPos in exit_coords:
+            pygame.draw.rect(screen, (255, 255, 0), (exitPos[0] * CELL_SIZE, exitPos[1] * CELL_SIZE, CELL_SIZE, CELL_SIZE))
 
     def caught(self, surface, start_time):
         font = pygame.font.Font(None, 50)
@@ -99,6 +102,7 @@ class Maz:
             elapsed_time_text = font.render(f"Время игры: {int(elapsed_time)} сек.", True, WHITE)
             surface.blit(elapsed_time_text,
                          (WIDTH * CELL_SIZE // 2 - elapsed_time_text.get_width() // 2, HEIGHT * CELL_SIZE // 2 + 50))
+
 
     def move_player(self, player_pos, direction):
         x, y = player_pos
@@ -163,12 +167,13 @@ class Monster:
     def move_monster(self):
         new_x, new_y = self.position
 
+
         # Двигаемся в текущем направлении
         if self.direction == "N" and not self.maze.maze[new_y][new_x]['N']:
             new_y -= 1
         elif self.direction == "S" and not self.maze.maze[new_y][new_x]['S']:
             new_y += 1
-        elif self.direction == "W" and not self.maze.maze[new_y][new_x]['W']:
+        elif self.direction == "W"  and not self.maze.maze[new_y][new_x]['W']:
             new_x -= 1
         elif self.direction == "E" and not self.maze.maze[new_y][new_x]['E']:
             new_x += 1
@@ -177,10 +182,13 @@ class Monster:
 
         self.position = (new_x, new_y)
 
+
+
     def move_towards_player(self, direction):
         x, y = self.position
 
         # Двигаем монстра в указанном направлении, если это возможно
+
         if direction == 'N' and not self.maze.maze[y][x]['N']:
             y -= 1
         elif direction == 'S' and not self.maze.maze[y][x]['S']:
@@ -200,6 +208,9 @@ def main():
     pygame.init()
     mazf = Maz()
     maze = mazf.generate_maze(WIDTH, HEIGHT)
+
+    #точки выхода в лабирините
+    exit_coords = list(([(0, 0), (WIDTH - 1, 0), (0, HEIGHT - 1), (WIDTH - 1, HEIGHT - 1)]))
 
     player = Player(mazf)
     player_pos = player.generate_posion_player()
@@ -223,6 +234,7 @@ def main():
 
     #Указать количество монстров
 
+
     running = True
     while running:
         screen.fill(WHITE)  # Очистка перед отрисовкой
@@ -238,11 +250,13 @@ def main():
                     mazf.generate_maze(WIDTH, HEIGHT)
                     player_pos = player.generate_posion_player()
                     screen.fill(WHITE)
+                    exit_coords = list(([(0, 0), (WIDTH - 1, 0), (0, HEIGHT - 1), (WIDTH - 1, HEIGHT - 1)]))
                     listOfMomster.clear()
                     MonsterPosition.clear()
                     for _ in range(N_mosters):
                         monster = Monster(mazf, player_pos)
                         listOfMomster.append(monster)
+
 
         keys = pygame.key.get_pressed()
         if not isEnd:
@@ -260,11 +274,12 @@ def main():
                 time.sleep(0.1)
 
         # Проверка на достижение угла карты
-        if player_pos == (0, 0) or \
-                player_pos == (WIDTH - 1, 0) or \
-                player_pos == (0, HEIGHT - 1) or \
-                player_pos == (WIDTH - 1, HEIGHT - 1):
-            # Генерация новой карты и монстров
+        if player_pos in exit_coords:
+            exit_coords = list(([(0, 0), (WIDTH - 1, 0), (0, HEIGHT - 1), (WIDTH - 1, HEIGHT - 1)]))
+
+            exit_coords.pop(exit_coords.index(player_pos))
+
+            #Генерация новой карты и монстров
             mazf.generate_maze(WIDTH, HEIGHT)
             player_pos = player.generate_posion_player()
             listOfMomster.clear()
@@ -274,17 +289,20 @@ def main():
                 listOfMomster.append(monster)
 
         # Движение монстров
+
         for monster in listOfMomster:
             monster.move(player_pos)
             MonsterPosition.append(monster.position)
 
+
         # Отрисовка лабиринта, игрока и монстров
-        mazf.draw_maze(screen)
+        mazf.draw_maze(screen, exit_coords)
         px, py = player_pos
 
         # Проверка на столкновение
         if not isEnd and player_pos in MonsterPosition:
             isEnd = True
+
             print("Game Over! The monster caught you!")
 
         # Отрисовка элементов после того как тебя поймали
@@ -304,7 +322,6 @@ def main():
 
     pygame.quit()
     sys.exit()
-
 
 if __name__ == "__main__":
     main()
