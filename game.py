@@ -1,7 +1,7 @@
 import pygame
 import random
 import sys
-import time
+import os
 
 WIDTH = 50
 HEIGHT = 30
@@ -214,6 +214,13 @@ def main():
 
     player = Player(mazf)
     player_pos = player.generate_posion_player()
+
+    screen_info = pygame.display.Info()
+    screen_width, screen_height = screen_info.current_w, screen_info.current_h
+
+    x = (screen_width - (CELL_SIZE*WIDTH)) // 2
+    y = (screen_height - (CELL_SIZE*HEIGHT)) // 2
+
 
     N_mosters = 15
     listOfMomster = list()

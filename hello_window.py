@@ -6,6 +6,8 @@ from game import main
 # Инициализация Pygame
 pygame.init()
 
+os.environ['SDL_VIDEO_WINDOW_POS'] = f"{30},{50}"
+
 # Настройки окна
 WIDTH, HEIGHT = 600, 400
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -71,6 +73,8 @@ while running:
                     write_to_csv(input_text.strip())
                     print(f"Игрок {input_text.strip()} добавлен в CSV!")
                     running = False
+                    main()
+                    exit()
             elif event.key == pygame.K_BACKSPACE:  # Удаление символа
                 input_text = input_text[:-1]
             else:
