@@ -1,9 +1,12 @@
 import pygame
 import csv
+import os
 from game import main
 
 # Инициализация Pygame
 pygame.init()
+
+os.environ['SDL_VIDEO_WINDOW_POS'] = f"{30},{50}"
 
 # Настройки окна
 WIDTH, HEIGHT = 600, 400
@@ -29,6 +32,12 @@ button = pygame.Rect(250, 250, 100, 50)
 
 # CSV-файл для записи
 csv_file = "players.csv"
+
+# Создание файла, если он не существует
+if not os.path.exists(csv_file):
+    with open(csv_file, mode="w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+        writer.writerow(["Nickname", "Score"])  # Заголовки столбцов
 
 # Функция для записи данных в CSV
 def write_to_csv(nickname, score=0):
@@ -64,6 +73,8 @@ while running:
                     write_to_csv(input_text.strip())
                     print(f"Игрок {input_text.strip()} добавлен в CSV!")
                     running = False
+                    main()
+                    exit()
             elif event.key == pygame.K_BACKSPACE:  # Удаление символа
                 input_text = input_text[:-1]
             else:
