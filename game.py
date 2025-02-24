@@ -70,7 +70,7 @@ class Maz:
         print(self.maze)
         return self.maze
 
-    def draw_maze(self, screen):
+    def draw_maze(self, screen, exit_coords):
         for y in range(HEIGHT):
             for x in range(WIDTH):
                 cell = self.maze[y][x]
@@ -83,6 +83,9 @@ class Maz:
                     pygame.draw.line(screen, BLACK, (px, py), (px, py + CELL_SIZE), 2)
                 if cell['E']:
                     pygame.draw.line(screen, BLACK, (px + CELL_SIZE, py), (px + CELL_SIZE, py + CELL_SIZE), 2)
+
+        for exitPos in exit_coords:
+            pygame.draw.rect(screen, (255, 255, 0), (exitPos[0] * CELL_SIZE, exitPos[1] * CELL_SIZE, CELL_SIZE, CELL_SIZE))
 
     def caught(self, surface, start_time):
         font = pygame.font.Font(None, 50)
@@ -247,13 +250,13 @@ def main():
                     mazf.generate_maze(WIDTH, HEIGHT)
                     player_pos = player.generate_posion_player()
                     screen.fill(WHITE)
+                    exit_coords = list(([(0, 0), (WIDTH - 1, 0), (0, HEIGHT - 1), (WIDTH - 1, HEIGHT - 1)]))
                     listOfMomster.clear()
                     MonsterPosition.clear()
                     for _ in range(N_mosters):
                         monster = Monster(mazf, player_pos)
                         listOfMomster.append(monster)
 
-                # Очистить экран
 
         keys = pygame.key.get_pressed()
         if not isEnd:
@@ -293,7 +296,7 @@ def main():
 
 
         # Отрисовка лабиринта, игрока и монстров
-        mazf.draw_maze(screen)
+        mazf.draw_maze(screen, exit_coords)
         px, py = player_pos
 
         # Проверка на столкновение
