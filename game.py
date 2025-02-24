@@ -259,12 +259,16 @@ def main():
         if not isEnd:
             if keys[pygame.K_UP]:
                 player_pos = mazf.move_player(player_pos, 'N')
+                time.sleep(0.1)
             if keys[pygame.K_DOWN]:
                 player_pos = mazf.move_player(player_pos, 'S')
+                time.sleep(0.1)
             if keys[pygame.K_LEFT]:
                 player_pos = mazf.move_player(player_pos, 'W')
+                time.sleep(0.1)
             if keys[pygame.K_RIGHT]:
                 player_pos = mazf.move_player(player_pos, 'E')
+                time.sleep(0.1)
 
         # Проверка на достижение угла карты
         if player_pos in exit_coords:
