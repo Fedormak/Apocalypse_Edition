@@ -28,7 +28,7 @@ class Player:
             if not (self.maze.maze[y][x]['N'] or self.maze.maze[y][x]['S'] or
                     self.maze.maze[y][x]['W'] or self.maze.maze[y][x]['E']):
                 continue
-            return (x, y)
+            return (0, 1)
 
 
 class Maz:
